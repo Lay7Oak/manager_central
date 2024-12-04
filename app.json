@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "new_project",
+    "slug": "new_project",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": ".src/assets/Logo.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-font"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "2f598e24-61ef-4442-8499-53a897a4076b"
+      }
+    }
+  }
+}
