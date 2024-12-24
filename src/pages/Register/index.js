@@ -81,6 +81,11 @@ export default function Register() {
       return;
     }
   
+    if (senha.length < 6) {
+      Alert.alert('A senha deve ter no mínimo 6 caracteres.');
+      return;
+    }
+  
     if (!validarSenha(senha)) {
       Alert.alert(
         'A senha deve conter:',
@@ -125,15 +130,12 @@ export default function Register() {
         navigation.navigate('SignIn');
       })
       .catch((error) => {
-        Alert.alert('Não foi possível realizar o cadastro:','Verifique os dados fornecidos e tente novamente.');
+        Alert.alert('Não foi possível realizar o cadastro:', 'Verifique os dados fornecidos e tente novamente.');
       })
       .finally(() => {
         setIsLoading(false);
       });
-  };
-  
-  
-
+  };  
   return (
     <ScrollView>
       <View style={styles.container}>
@@ -217,8 +219,6 @@ export default function Register() {
               />
             </TouchableOpacity>
           </View>
-
-          
           <View style={styles.checkboxContainer}>
           <CheckBox
               style={{ flex: 1, padding: 10, margin:20, }}
@@ -240,8 +240,6 @@ export default function Register() {
             >
             <Text style={styles.buttonText}>{isLoading ? 'Carregando...' : 'Cadastrar'}</Text>
           </TouchableOpacity>
-
-          
         </Animatable.View>
        
       </View>
