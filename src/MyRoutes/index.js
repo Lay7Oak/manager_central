@@ -1,6 +1,6 @@
 
 import { createStackNavigator } from '@react-navigation/stack';
-import { CustomBackButton } from './return';  // Importando o botão de voltar
+import { CustomBackButton } from './return';
 import Welcome from '../pages/Welcome';
 import SignIn from '../pages/SignIn';
 import ForgotPassword from '../pages/ForgotPassword';
@@ -12,6 +12,8 @@ import Orders from '../pages/Orders/index';
 import Finance from '../pages/Finance/index';
 import Services from '../pages/Services/index';
 import UserPage from '../pages/UserPage/index';
+import TermsAndPolicy from '../pages/TermsAndPolicy/index';
+import HelpPage from '../pages/HelpPage/index';
 
 const Stack  = createStackNavigator();
 
@@ -123,7 +125,32 @@ export default function MyRoutes() {
                headerTitleAlign: 'center',
            }} 
          />
+
+          <Stack.Screen 
+           name= "TermsAndPolicy"
+           component={TermsAndPolicy}
+           options={{
+               headerLeft: () => <CustomBackButton />,  
+               headerShown: true,
+               headerTitle: 'Termo de Uso e Política de Privacidade',
+               headerTitleAlign: 'center',
+           }} 
+         />
+
+          <Stack.Screen 
+           name= "HelpPage"
+           component={HelpPage}
+           options={{
+               headerLeft: () => <CustomBackButton />,  
+               headerShown: true,
+               headerTitle: 'Ajuda',
+               headerTitleAlign: 'center',
+           }} 
+         />
+
        </Stack.Navigator>
+
+       
     );
 }
 

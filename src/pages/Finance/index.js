@@ -3,7 +3,9 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView,
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { DataContext } from '../../Persistence/DataContext'; 
 import DateTimePicker from '@react-native-community/datetimepicker';
-
+import styles from './style';
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
 
 
 export default function Finance() {
@@ -29,7 +31,6 @@ export default function Finance() {
   const calcularReceitas = () => transacoes.filter(t => t.tipo === 'receita').reduce((acc, t) => acc + parseFloat(t.valor), 0);
   const calcularDespesas = () => transacoes.filter(t => t.tipo === 'despesa').reduce((acc, t) => acc + parseFloat(t.valor), 0);
 
-  
   const adicionarReceitaExtra = () => {
     if (!valorReceitaExtra || !descricaoReceita) {
       Alert.alert('Erro', 'Preencha todos os campos da receita.');
@@ -85,19 +86,20 @@ export default function Finance() {
   const limparLista = () => {
     Alert.alert(
       'Limpar Lista',
-      'Tem certeza que deseja limpar a lista de transações? Os dados serão apagados da lista e mantidos apenas no PDF.',
+      'Tem certeza que deseja limpar a lista de transações? Os dados serão apagados da lista e mantidos apenas no PDF. Por favor, escolha salvar ou compartilhar o PDF para garantir que os dados não sejam perdidos.',
       [
         { text: 'Cancelar' },
         { 
           text: 'Baixar PDF e Limpar', 
-          onPress: () => {
+          onPress: async () => {
+            await generatePDF();
             setTransacoes([]);
             setAppData({ ...appData, transacoes: [] });
           }
         },
       ]
     );
-  };
+  };  
 
   const handleDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || novoPedido.data;
@@ -105,9 +107,44 @@ export default function Finance() {
     setNovoPedido({ ...novoPedido, data: currentDate });
   };
 
+  const generatePDF = async () => { 
+    const htmlContent = `
+      <html> 
+        <head>
+          <style>
+            ul {
+              list-style-type: none;
+              padding: 0;
+            }
+            li {
+              margin-bottom: 20px; /* Ajuste o valor para o espaçamento desejado */
+            }
+          </style>
+        </head>
+        <body> 
+          <h1>Lista de Transações</h1>
+          <ul> 
+            ${transacoes.map(transacao => ` 
+              <li> 
+                <strong>Tipo:</strong> ${transacao.tipo} <br />
+                <strong>Valor:</strong> ${transacao.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} <br /> 
+                <strong>Descrição:</strong> ${transacao.descricao} <br />
+                <strong>Data:</strong> ${new Date(transacao.data).toLocaleDateString('pt-BR')} <br /><br /><br />
+              </li> 
+            `).join('')}
+          </ul> 
+        </body> 
+      </html>
+    `; 
+  
+    const { uri } = await Print.printToFileAsync({ html: htmlContent });
+    await Sharing.shareAsync(uri);
+  };
+  
+  
   return (
     <ScrollView>
-      <StatusBar backgroundColor="#f0ad4e" barStyle="light-content" />
+      <StatusBar backgroundColor="#33808a" barStyle="light-content" />
     
       <View style={styles.container}>
         
@@ -123,7 +160,10 @@ export default function Finance() {
           </TouchableOpacity>
         </View>
 
+        <Text style={styles.total}>Painel de Finanças</Text>
+
         <View style={styles.dashboard}>
+       
           <Text style={styles.dashboardItem}>
             Receitas: <Text style={styles.receita}>R$ {receitas.toFixed(2)}</Text>
           </Text>
@@ -134,13 +174,11 @@ export default function Finance() {
             Lucro: <Text style={lucro >= 0 ? styles.receita : styles.despesa}>R$ {lucro.toFixed(2)}</Text>
           </Text>
         </View>
-
-        {/* Seção de adicionar receita e gasto */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Adicionar Receita Extra</Text>
             <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.iconButton}>
-              <Icon name="calendar" size={20} color="#8b0045" />
+              <Icon name="calendar" size={25} color="#919191" />
             </TouchableOpacity>
           </View>
           <TextInput
@@ -169,13 +207,11 @@ export default function Finance() {
             onChange={handleDateChange}
           />
         )}
-
-        {/* Adicionar Gasto */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Adicionar Gasto Extra</Text>
             <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.iconButton}>
-              <Icon name="calendar" size={20} color="#8b0045" />
+              <Icon name="calendar" size={25} color="#919191" />
             </TouchableOpacity>
           </View>
           <TextInput
@@ -195,8 +231,6 @@ export default function Finance() {
             <Text style={styles.buttonText}>Adicionar Gasto</Text>
           </TouchableOpacity>
         </View>
-
-        {/* Detalhes */}
         <TouchableOpacity
           style={styles.detailsButton}
           onPress={() => setMostrarDetalhes(!mostrarDetalhes)}
@@ -205,8 +239,6 @@ export default function Finance() {
             {mostrarDetalhes ? 'Ocultar Detalhes' : 'Mostrar Detalhes'}
           </Text>
         </TouchableOpacity>
-
-        {/* Transações Detalhadas */}
         {mostrarDetalhes && (
           <View style={styles.transacoesContainer}>
             <View style={styles.actionsContainer}>
@@ -229,9 +261,7 @@ export default function Finance() {
                     R$ {Math.abs(transacao.valor).toFixed(2)}  
                   </Text>{"\n"}
                   <Text style={styles.descricao}>{transacao.descricao}</Text>{"\n"}
-                  
                   <Text style={styles.data}>{transacao.data ? new Date(transacao.data).toLocaleDateString() : ''}</Text>
-                
                 </Text>
               </View>
             ))}
@@ -241,55 +271,3 @@ export default function Finance() {
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#fff' },
-  searchContainer: { flexDirection: 'row', marginBottom: 30 },
-  searchInput: { flex: 1, height: 40, borderColor: '#ccc', borderWidth: 1, borderRadius: 5, paddingLeft: 10 },
-  searchButton: { backgroundColor: '#f0ad4e', paddingHorizontal: 15, justifyContent: 'center', alignItems: 'center', borderRadius: 5, marginLeft: 10 },
-  dashboard: { marginBottom: 20, padding: 20, backgroundColor: '#f9f9f9', borderRadius: 10, borderWidth: 1, borderColor: '#ddd' },
-  dashboardItem: { fontSize: 19, marginBottom: 5 },
-  receita: { color: 'green', fontSize: 19, marginRight: 10 },
-  despesa: { color: 'red', fontSize: 19, marginRight: 10 },
-  section: { marginBottom: 20 },
-  sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },
-  sectionTitle: { fontSize: 19, fontWeight: 'bold', width:'65%', },
-  input: { height: 50, borderColor: '#ccc', borderWidth: 1, marginBottom: 10, paddingLeft: 10, borderRadius: 5 },
-  button: { backgroundColor: '#F0AD4E', paddingVertical: 12, borderRadius: 5, marginTop: 20, alignItems: 'center' },
-  buttonText: { color: '#fff', fontWeight: 'bold', fontSize: 18 },
-  iconButton: { marginRight:35, },
-  detailsButton: { backgroundColor: '#919191', paddingVertical: 12, borderRadius: 5, marginTop: 20, alignItems: 'center' },
-  detailsButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 18 },
-  actionsContainer: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 },
-  buttonOrg: { backgroundColor: '#91919191', paddingVertical: 9, paddingHorizontal: 9, borderRadius: 5, alignItems: 'center', width: '47%' },
-  transacoesContainer: { marginBottom: 15, padding: 15, backgroundColor: '#f9f9f9', borderRadius: 8, shadowColor: '#000', shadowOpacity: 0.1 },
- transacaoItem: {
-  backgroundColor: '#fff',
-  padding: 7,
-  marginVertical: 5,
-  borderRadius: 5,
-  borderWidth: 1,
-  borderColor: '#ddd',
-  justifyContent: 'space-between',
-  
-},
-
-transacaoText: {
-  fontSize: 19,
-  color: '#333',
-  justifyContent: 'space-between',
-  lineHeight: 30,
-},
-
-descricao: {
-  fontSize: 19,
-  marginRight: 10, 
-},
-
-data: {
-  fontSize: 14,
-  color: '#777',
- 
-},
-
-});

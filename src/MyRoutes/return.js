@@ -10,7 +10,7 @@ export const CustomBackButton = () => {
 
   return (
     <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 20 }}>
-      <Icon name="arrow-left" size={21} color="#8b0045" />
+      <Icon name="arrow-left" size={21} color="#990a17" />
     </TouchableOpacity>
   );
 };

@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "new_project",
+    "name": "Manager Central",
     "slug": "new_project",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": ".src/assets/Logo.png",
+    "icon": "./assets/mcfnewlogo.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/iconMG.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -25,12 +25,14 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-font"
+      "expo-font",
+      "expo-secure-store"
     ],
     "extra": {
       "eas": {
         "projectId": "2f598e24-61ef-4442-8499-53a897a4076b"
       }
-    }
+    },
+    "newArchEnabled": true
   }
 }

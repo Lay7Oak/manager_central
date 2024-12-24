@@ -1,22 +1,15 @@
 import React, { useState, useContext, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  Alert,
-  StatusBar
-} from 'react-native';
+import {  View,  Text,  TextInput,  TouchableOpacity,  StyleSheet,  ScrollView,  Alert,  StatusBar} from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { DataContext } from '../../Persistence/DataContext'; // Importando o contexto global
+import { DataContext } from '../../Persistence/DataContext';
+import styles from './style';
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
 
-
-export default function Pedidos() {
-  const { appData, setAppData } = useContext(DataContext); // Acessando o contexto global
+  export default function Pedidos() {
+  const { appData, setAppData } = useContext(DataContext); 
   const [novoPedido, setNovoPedido] = useState({
     id: '',
     cliente: '',
@@ -35,60 +28,71 @@ export default function Pedidos() {
 
 
   useEffect(() => {
-    // Carregar os pedidos armazenados quando o componente for montado
     if (appData?.pedidos) {
       setPedidos(appData.pedidos);
     }
   }, [appData]);
 
-  const [pedidos, setPedidos] = useState(appData?.pedidos || []); // Inicializa a lista de pedidos com os dados carregados
-
+  const [pedidos, setPedidos] = useState(appData?.pedidos || []);
   const formasPagamento = ['Cartão', 'Pix', 'Dinheiro'];
   const produtosCadastrados = appData?.produtos || [];
-
+  const produtosDisponiveis = produtosCadastrados.filter(produto => produto.quantidade > 0);
   const calcularTotal = () => {
   const quantidade = parseFloat(novoPedido.quantidade) || 0;
-  const valorUnitario = parseFloat(novoPedido.valorUnitario) || 0;
+  const valorUnitario = parseFloat(novoPedido.valorUnitario.replace(',', '.')) || 0;
   return quantidade * valorUnitario;
 };
-
-  const adicionarPedido = () => {
-    if (!novoPedido.cliente || !novoPedido.produto || !novoPedido.quantidade) {
-      Alert.alert('Erro', 'Preencha todos os campos obrigatórios.');
-      return;
-    }
-
-    const valorTotal = calcularTotal();
-    const pedido = {
-      ...novoPedido,
-      id: Date.now().toString(),
-      valorTotal,
-      statusData: new Date(),
-    };
-
-    const novosPedidos = [...pedidos, pedido];
-    setPedidos(novosPedidos);
-    setAppData(prev => ({ ...prev, pedidos: novosPedidos })); // Atualiza os dados no contexto global
-
-    setNovoPedido({
-      id: '',
-      cliente: '',
-      produto: '',
-      data: new Date(),
-      quantidade: '',
-      valorUnitario: '',
-      formaPagamento: '',
-      status: 'Aberto',
-      descricao: '',
-    });
+const adicionarPedido = () => {
+  if (!novoPedido.cliente || !novoPedido.produto || !novoPedido.quantidade) {
+    Alert.alert('Erro', 'Preencha todos os campos obrigatórios.');
+    return;
+  }
+  const produtoSelecionado = produtosCadastrados.find(p => p.nomeProduto === novoPedido.produto);
+  if (produtoSelecionado && novoPedido.quantidade > produtoSelecionado.quantidade) {
+    Alert.alert('Erro', `A quantidade disponível de ${produtoSelecionado.nomeProduto} é ${produtoSelecionado.quantidade}.`);
+    return;
+  }
+  const valorTotal = calcularTotal();
+  const pedido = {
+    ...novoPedido,
+    id: Date.now().toString(),
+    valorTotal,
+    statusData: new Date(),
   };
+  const updatedProdutos = produtosCadastrados.map(produto => {
+    if (produto.nomeProduto === pedido.produto) {
+      const novaQuantidade = produto.quantidade - pedido.quantidade;
+      return {
+        ...produto,
+        quantidade: novaQuantidade > 0 ? novaQuantidade : 0,
+        status: novaQuantidade > 0 ? "Disponível" : "Indisponível",
+      };
+    }
+    return produto;
+  });
 
+  setAppData(prev => ({ ...prev, produtos: updatedProdutos }));
+
+  const novosPedidos = [...pedidos, pedido];
+  setPedidos(novosPedidos);
+  setAppData(prev => ({ ...prev, pedidos: novosPedidos })); 
+
+  setNovoPedido({
+    id: '',
+    cliente: '',
+    produto: '',
+    data: new Date(),
+    quantidade: '',
+    valorUnitario: '',
+    formaPagamento: '',
+    status: 'Aberto',
+    descricao: '',
+  });
+};
   const alterarStatus = (id, novoStatus) => {
   const pedidosAtualizados = pedidos.map(pedido => {
     if (pedido.id === id) {
-      // Verifica se o status mudou para "Pago"
       if (novoStatus === 'Pago' && pedido.status !== 'Pago') {
-        // Adiciona a receita na lista de transações em appData
         const novaTransacao = {
           tipo: 'receita',
           valor: parseFloat(pedido.valorTotal),
@@ -104,20 +108,69 @@ export default function Pedidos() {
   });
 
   setPedidos(pedidosAtualizados);
-  setAppData(prev => ({ ...prev, pedidos: pedidosAtualizados })); // Atualiza os pedidos no contexto global
+  setAppData(prev => ({ ...prev, pedidos: pedidosAtualizados }));
 };
 
  const editarPedido = id => {
   const pedido = pedidos.find(p => p.id === id);
   if (pedido) {
-    // Garantir que 'data' seja um objeto Date válido
-    const data = new Date(pedido.data); 
+    if (pedido.status !== 'Pendente') {
+      Alert.alert('Ação não permitida', 'Somente pedidos com status "Aberto" podem ser editados.');
+      return; 
+    }
+    const data = new Date(pedido.data);
     setNovoPedido({
       ...pedido,
-      data: data instanceof Date && !isNaN(data) ? data : new Date(),  // Se não for válida, coloca uma data atual
+      data: data instanceof Date && !isNaN(data) ? data : new Date(), 
     });
-    setPedidos(pedidos.filter(p => p.id !== id));
   }
+};
+
+
+const cancelarPedido = (id) => {
+  const pedido = pedidos.find(p => p.id === id);
+  if (!pedido) return;
+
+
+  const updatedProdutos = appData.produtos.map(produto => {
+    if (produto.nomeProduto === pedido.produto) {
+      const novaQuantidade = Number(produto.quantidade) + Number(pedido.quantidade);
+      return {
+        ...produto,
+        quantidade: novaQuantidade,
+        status: novaQuantidade > 0 ? 'Disponível' : produto.status,
+      };
+    }
+    return produto;
+  });
+  setAppData(prev => ({ ...prev, produtos: updatedProdutos }));
+
+
+  const novasTransacoes = (appData.transacoes || []).map(transacao => {
+    if (
+      transacao.descricao === `Pedido Pago: ${pedido.cliente}` &&
+      transacao.valor === parseFloat(pedido.valorTotal)
+    ) {
+     
+      if (pedido.status === 'Pago') {
+        return {
+          ...transacao,
+          descricao: `${transacao.descricao} (Cancelado)`,
+          valor: transacao.valor - parseFloat(pedido.valorTotal), 
+        };
+      }
+    }
+    return transacao;
+  });
+
+  setAppData(prev => ({ ...prev, transacoes: novasTransacoes }));
+
+
+  const pedidosAtualizados = pedidos.map(p =>
+    p.id === id ? { ...p, status: 'Cancelado', statusData: new Date() } : p
+  );
+  setPedidos(pedidosAtualizados);
+  setAppData(prev => ({ ...prev, pedidos: pedidosAtualizados }));
 };
 
 
@@ -131,22 +184,22 @@ export default function Pedidos() {
     const dateB = new Date(b.data);
 
     if (ordenarPor === 'novos') {
-      return dateB - dateA; // Ordena da data mais recente para a mais antiga
+      return dateB - dateA;
     } else {
-      return dateA - dateB; // Ordena da data mais antiga para a mais recente
+      return dateA - dateB;
     }
   });
 
- const limparLista = () => {
+  const limparLista = () => {
     Alert.alert(
       'Limpar Lista',
-      'Tem certeza que deseja limpar a lista de produtos? Os dados serão apagados da lista e mantidos apenas no PDF.',
+      'Tem certeza que deseja limpar a lista de pedidos? Os dados serão apagados da lista e mantidos apenas no PDF. Por favor, escolha salvar ou compartilhar o PDF para garantir que os dados não sejam perdidos.',
       [
         { text: 'Cancelar' },
         { 
           text: 'Baixar PDF e Limpar', 
-          onPress: () => {
-            // integrar a função para gerar o PDF
+          onPress: async () => {
+            await generatePDF();
             setPedidos([]);
             setAppData({ ...appData, pedidos: [] });
           }
@@ -154,45 +207,75 @@ export default function Pedidos() {
       ]
     );
   };
-
-  return (
-    <ScrollView >
+            const generatePDF = async () => { 
+              const htmlContent = `
+                <html> 
+                  <head>
+                    <style>
+                      ul {
+                        list-style-type: none;
+                        padding: 0;
+                      }
+                      li {
+                        margin-bottom: 20px;
+                      }
+                    </style>
+                  </head>
+                  <body> 
+                    <h1>Lista de Pedidos</h1>
+                    <ul> 
+                      ${pedidos.map(pedido => ` 
+                        <li> 
+                          <strong>Cliente:</strong> ${pedido.cliente} <br />
+                          <strong>Produto:</strong> ${pedido.produto} <br /> 
+                          <strong>Quantidade:</strong> ${pedido.quantidade} <br />
+                          <strong>Valor Unitário:</strong> ${pedido.valorUnitario.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} <br />
+                          <strong>Valor Total:</strong> ${pedido.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} <br />
+                          <strong>Forma de Pagamento:</strong> ${pedido.formaPagamento} <br />
+                          <strong>Status:</strong> ${pedido.status} <br />
+                          <strong>Data:</strong> ${new Date(pedido.data).toLocaleDateString()} <br />
+                          <strong>Descrição:</strong> ${pedido.descricao} <br /> <br /><br />
+                        </li> 
+                      `).join('')}
+                    </ul> 
+                  </body> 
+                </html>
+              `; 
+            
+              const { uri } = await Print.printToFileAsync({ html: htmlContent });
+              await Sharing.shareAsync(uri);
+            };
+            
+return (
+  <ScrollView>
     <StatusBar backgroundColor="#7A1745" barStyle="light-content" />
-    
     <View style={styles.container}>    
-
-      {/* Barra de Pesquisa */}
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
           placeholder="Buscar por Cliente, Produto ou Status"
           value={busca}
-          onChangeText={text => setBusca(text)} // Atualiza o estado 'busca'
-        />
+          onChangeText={text => setBusca(text)}        />
         <TouchableOpacity style={styles.searchButton}>
           <Icon name="search" size={20} color="#fff" />
         </TouchableOpacity>
       </View>
-
+      <Text style={styles.total}>Adicionar Pedidos </Text>
       <ScrollView style={styles.scrollView}>
         <TextInput
           placeholder="Cliente"
           style={styles.input}
           value={novoPedido.cliente}
-          onChangeText={text => setNovoPedido({ ...novoPedido, cliente: text })}
-        />
-
-        {/* Campo de Data com DateTimePicker */}
+          onChangeText={text => setNovoPedido({ ...novoPedido, cliente: text })}        />
         <View style={styles.datePickerContainer}>
           <TextInput
             placeholder="Data do Pedido"
             style={styles.inputWithIcon}
             value={novoPedido.data ? novoPedido.data.toLocaleDateString() : ''}
-            onFocus={() => setShowDatePicker(true)} // Abre o seletor de data ao focar
-            showSoftInputOnFocus={false} // Impede a exibição do teclado
-          />
+            onFocus={() => setShowDatePicker(true)}
+            showSoftInputOnFocus={false}       />
           <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.iconButton}>
-            <Icon name="calendar" size={20} color="#8b0045" />
+            <Icon name="calendar" size={25} color="#A93A6A" />
           </TouchableOpacity>
         </View>
         {showDatePicker && (
@@ -203,91 +286,60 @@ export default function Pedidos() {
             onChange={(event, date) => {
               setShowDatePicker(false);
               if (date) {
-                setNovoPedido({ ...novoPedido, data: date });
-              }
-            }}
-          />
-        )}
-
-        {/* Select de Produtos */}
+                setNovoPedido({ ...novoPedido, data: date });       }     }}       />    )}
         <Text style={styles.label}>Produto:</Text>
-       <Picker
-  selectedValue={novoPedido.produto}
-  onValueChange={(itemValue) => {
-    const produtoSelecionado = produtosCadastrados.find(p => p.nomeProduto === itemValue);
-    setNovoPedido({
-      ...novoPedido,
-      produto: itemValue,
-      valorUnitario: produtoSelecionado ? produtoSelecionado.precoUnitario : '',
-    });
-  }}
->
-  <Picker.Item label="Selecione um produto" value="" />
-  {produtosCadastrados.map((produto) => (
-    <Picker.Item
-      key={produto.id}
-      label={`${produto.nomeProduto} (R$${produto.precoUnitario})`}
-      value={produto.nomeProduto}
-    />
-  ))}
-</Picker>
-
-
+        <Picker
+          selectedValue={novoPedido.produto}
+          onValueChange={(itemValue) => {
+            const produtoSelecionado = produtosDisponiveis.find(p => p.nomeProduto === itemValue);
+            setNovoPedido({
+              ...novoPedido,
+              produto: itemValue,
+              valorUnitario: produtoSelecionado ? produtoSelecionado.precoUnitario : '',     });    }}     >
+          <Picker.Item label="Selecione um produto" value="" />
+          {produtosDisponiveis.map((produto) => (
+            <Picker.Item
+              key={produto.id}
+              label={`${produto.nomeProduto} (R$${produto.precoUnitario})`}    value={produto.nomeProduto}    />   ))}
+        </Picker>
         <TextInput
           placeholder="Quantidade"
           style={styles.input}
           keyboardType="numeric"
           value={novoPedido.quantidade}
-          onChangeText={text => setNovoPedido({ ...novoPedido, quantidade: text })}
-        />
-
-        {/* Exibição do Total */}
-        <Text style={styles.total}>
-          Total: R$ {calcularTotal().toFixed(2)}
-        </Text>
-
-        {/* Select de Forma de Pagamento */}
+          onChangeText={text => setNovoPedido({ ...novoPedido, quantidade: text })}  />
+        <Text style={styles.total}> Total: R$ {calcularTotal().toFixed(2)}   </Text>
         <Text style={styles.label}>Forma de Pagamento:</Text>
         <Picker
           selectedValue={novoPedido.formaPagamento}
-          onValueChange={itemValue => setNovoPedido({ ...novoPedido, formaPagamento: itemValue })}
-          style={styles.dropdown}
-        >
+          onValueChange={itemValue => setNovoPedido({ ...novoPedido, formaPagamento: itemValue })}    style={styles.dropdown}   >
           <Picker.Item label="Selecione uma forma de pagamento" value="" />
           {formasPagamento.map(forma => (
-            <Picker.Item key={forma} label={forma} value={forma} />
-          ))}
+            <Picker.Item key={forma} label={forma} value={forma} /> ))}
         </Picker>
 
         <TextInput
           placeholder="Descrição"
           style={styles.input}
           value={novoPedido.descricao}
-          onChangeText={text => setNovoPedido({ ...novoPedido, descricao: text })}
-        />
-
+          onChangeText={text => setNovoPedido({ ...novoPedido, descricao: text })} />
         <TouchableOpacity style={styles.button} onPress={adicionarPedido}>
           <Text style={styles.buttonText}>Adicionar Pedido</Text>
         </TouchableOpacity>
-
         <View style={styles.divider} />
         <Text style={styles.sectionTitle}>Lista de Pedidos</Text>
-        <View style={styles.containerButtonSmall}  >
-          
-            <TouchableOpacity style={styles.buttonOrg} onPress={limparLista}>
-                 <Text style={styles.buttonText}>Limpar Lista</Text>
-                  </TouchableOpacity>
-                  
-           <TouchableOpacity
-              style={styles.buttonOrg}
-              onPress={() => setOrdenarPor(ordenarPor === 'novos' ? 'antigos' : 'novos')}
-            >
-              <Text style={styles.buttonText}>
-                {ordenarPor === 'novos' ? 'Ordenar Antigos' : 'Ordenar Novos'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-
+        <View style={styles.containerButtonSmall}>
+          <TouchableOpacity style={styles.buttonOrg} onPress={limparLista}>
+            <Text style={styles.buttonText}>Limpar Lista</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.buttonOrg}
+            onPress={() => setOrdenarPor(ordenarPor === 'novos' ? 'antigos' : 'novos')} >
+            <Text style={styles.buttonText}>
+              {ordenarPor === 'novos' ? 'Ordenar Antigos' : 'Ordenar Novos'}
+            </Text>
+          </TouchableOpacity>
+        </View>
         {pedidosFiltrados.map(pedido => (
           <View key={pedido.id} style={styles.pedido}>
             <Text style={styles.pedidoText}>Cliente: {pedido.cliente}</Text>
@@ -298,183 +350,57 @@ export default function Pedidos() {
             <Text style={styles.pedidoText}>Valor Total: R$ {pedido.valorTotal.toFixed(2)}</Text>
             <Text style={styles.pedidoText}>Forma de Pagamento: {pedido.formaPagamento}</Text>
             <Text style={styles.pedidoTextStatus}>Status: {pedido.status}</Text>
+            <View style={styles.containerButtonSmall}>
 
-           <View style = {styles.containerButtonSmall}>
+              <TouchableOpacity
+                style={[styles.buttonSmall, styles.editButton]}
+                onPress={() => editarPedido(pedido.id)}              >
+                <Text style={styles.buttonText}>Editar</Text>
+              </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[styles.buttonSmall, styles.editButton]}
-              onPress={() => editarPedido(pedido.id)}
-            >
-              <Text style={styles.buttonText}>Editar</Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.buttonSmall, styles.cancelButton]}
+                onPress={() => {
+                  Alert.alert(
+                    'Cancelar Pedido',
+                    `Tem certeza que deseja cancelar o pedido de ${pedido.produto}?`,
+                    [
+                      { text: 'Não', style: 'cancel' },
+                      {
+                        text: 'Sim',
+                        onPress: () => {
+                          alterarStatus(pedido.id, 'Cancelado');
+                          cancelarPedido(pedido.id);
+                        },
+                      },
+                    ]
+                  );
+                }}
+              >
+                <Text style={styles.buttonText}>Cancelar</Text>
+              </TouchableOpacity>
 
-             <TouchableOpacity
-              style={[styles.buttonSmall, styles.cancelButton]}
-              onPress={() => alterarStatus(pedido.id, 'Cancelado')}
-            >
-              <Text style={styles.buttonText}>Cancelar</Text>
-            </TouchableOpacity>
-
-             <TouchableOpacity
-              style={[styles.buttonSmall, styles.pagoButton]}
-              onPress={() => alterarStatus(pedido.id, 'Pago')}
-            >
-              <Text style={styles.buttonText}>Concluído</Text>
-            </TouchableOpacity>
-           
-           </View> 
+              <TouchableOpacity
+                style={[styles.buttonSmall, styles.pagoButton]}
+                onPress={() => {
+                  if (pedido.status === 'Aberto') {
+                    alterarStatus(pedido.id, 'Pago');
+                  } else {
+                    Alert.alert(
+                      'Ação Não Permitida',
+                      'Realize um novo pedido',
+                      [{ text: 'OK', style: 'cancel' }]
+                    );
+                  }
+                }}
+              >
+                <Text style={styles.buttonText}>Concluído</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         ))}
       </ScrollView>
     </View>
-    </ScrollView>
-  );
+  </ScrollView>
+);
 }
-
-const styles = StyleSheet.create({
-
-  total: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'right',
-    marginVertical: 10,
-  },
-   container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#fff',
-  },
-
-  searchContainer: {
-    flexDirection: 'row',
-    marginBottom: 30,
-  },
-  searchInput: {
-    flex: 1,
-    height: 40,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingLeft: 10,
-  },
-  searchButton: {
-    backgroundColor: '#7A1745',
-    paddingHorizontal: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 5,
-    marginLeft: 10,
-  },
-  
-  input: {
-    height: 50,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    marginBottom: 10,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-  },
-
- 
-  inputWithIcon: {  borderWidth: 1, borderColor: '#ccc', padding: 8, marginBottom: 10, borderRadius: 5, marginRight:10, height: 45},
-  datePickerContainer: { flexDirection: 'row', alignItems: 'center' },
-
-  iconButton: {
-    padding: 5,
-  },
-
-  dropdown: {
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    backgroundColor: '#fff',
-  },
-  button: {
-    backgroundColor: '#7A1745',
-    paddingVertical: 12,
-    borderRadius: 5,
-    marginTop: 20,
-    alignItems: 'center',
-  },
-  buttonText: { color: '#fff',
-    fontWeight: 'bold',
-    fontSize:18, },
- 
-  divider: {
-    height: 1,
-    backgroundColor: '#ccc',
-    marginVertical: 20,
-  },
-  sectionTitle: {
-    fontSize: 21,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    textAlign:'center',
-  },
-
-buttonOrg: {
-    marginTop:20,
-    width:'47%',
-    backgroundColor: '#A93A6A',
-    paddingVertical: 9,
-    paddingHorizontal: 9,
-    borderRadius: 5,
-    alignItems: 'center',
-    margin: '1%',
-    textAlign:'center',
-  },
-
-
-  pedido: {
-    marginBottom: 15,
-    padding: 15,
-    backgroundColor: '#f9f9f9',
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-  },
-
- 
-  pedidoText:{
-    fontSize: 19,
-    marginBottom: 5,
-  },
-
-
-  pedidoTextStatus:{
-   fontSize:20,
-   marginBottom: 30,
-   marginTop:9,
-  
-  },
-
-  containerButtonSmall:{
-   flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    alignItems: 'center', 
-    // marginHorizontal: 12,
-  },
-
- 
-  buttonSmall: {
-   paddingVertical: 12,
-    paddingHorizontal: 25,
-    borderRadius: 5,
-    marginTop: 15,
-  },
-  pagoButton: {
-    backgroundColor: '#48bcbe',
-  },
-  cancelButton: {
-    backgroundColor: '#919191',
-  },
-  editButton: {
-    backgroundColor: '#f0ad4e',
-  },
-  
-});
-
-

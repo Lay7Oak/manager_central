@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "539303833943",
+    "project_id": "managercentral-a07a3",
+    "storage_bucket": "managercentral-a07a3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:539303833943:android:2f9f85677e6b28e1340e12",
+        "android_client_info": {
+          "package_name": "com.lay_oak.new_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBwXYKLCR0U_BKkoeE6LwDwypl7_WtBZW4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
