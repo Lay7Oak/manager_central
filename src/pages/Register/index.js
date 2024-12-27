@@ -1,12 +1,13 @@
+//import { LinearGradient } from 'expo-linear-gradient';
+
 import React, { useState, useContext } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import CheckBox from 'react-native-check-box';
 import * as Animatable from 'react-native-animatable';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome'; 
 import { DataContext } from '../../Persistence/DataContext';
 import { setDoc, doc } from 'firebase/firestore'; 
-import { LinearGradient } from 'expo-linear-gradient';
 import { auth, firestore, createUserWithEmailAndPassword } from '../../../firebaseConfig';
 import styles from './style';
 

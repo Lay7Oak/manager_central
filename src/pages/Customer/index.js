@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, FlatList, Alert, StatusBar } from 'react-native';
+//import * as FileSystem from 'expo-file-system';
+
+import React, { useState, useContext } from 'react';
+import { View, Text, TextInput, TouchableOpacity, FlatList, Alert, StatusBar } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { DataContext } from '../../Persistence/DataContext';
 import styles from './style';
 import * as Print from 'expo-print';
-import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 
   export default function Customer() {

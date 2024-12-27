@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import {  View,  Text,  TextInput,  TouchableOpacity,  StyleSheet,  ScrollView,  Alert,  StatusBar} from 'react-native';
+import {  View,  Text,  TextInput,  TouchableOpacity, ScrollView,  Alert,  StatusBar} from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';

@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, FlatList, Alert, ScrollView, StatusBar} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView, StatusBar} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { DataContext } from '../../Persistence/DataContext';

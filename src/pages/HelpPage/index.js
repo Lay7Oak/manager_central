@@ -1,7 +1,7 @@
 
 import styles from './style';
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, } from 'react-native';
 
 const HelpScreen = () => {
   return (

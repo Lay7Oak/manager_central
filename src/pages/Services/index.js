@@ -1,10 +1,11 @@
+//import { Picker } from '@react-native-picker/picker';
+//import * as FileSystem from 'expo-file-system'; 
+
 import React, { useState, useContext, useEffect } from 'react';
-import {  View,  Text,  TextInput,  TouchableOpacity,  StyleSheet,  ScrollView,  Alert,  StatusBar,} from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import {  View,  Text,  TextInput,  TouchableOpacity, ScrollView,  Alert,  StatusBar,} from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { DataContext } from '../../Persistence/DataContext';
-import * as FileSystem from 'expo-file-system'; 
 import styles from './style';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
