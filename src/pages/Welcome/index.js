@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { LinearGradient } from 'expo-linear-gradient'; 
 import { useNavigation } from '@react-navigation/native';
@@ -19,7 +19,7 @@ export default function Welcome() {
         <View style={styles.containerLogo}>
           <Animatable.Image
             animation="flipInY"
-            source={require('../../myLogo/vermelhoMLogo.png')}
+            source={require('../../myLogo/mylogored.png')}
             style={{ width: '100%' }}
             resizeMode="contain"
           />

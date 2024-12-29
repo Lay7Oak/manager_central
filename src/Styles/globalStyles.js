@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 export const globalStyles = StyleSheet.create({
   text: {
     fontFamily: 'Poppins_800ExtraBold_Italic',
-    fontFamily:'PlayfairDisplay_400Regular_Italic',
+    // fontFamily:'PlayfairDisplay_400Regular_Italic',
   },
 
   container: {

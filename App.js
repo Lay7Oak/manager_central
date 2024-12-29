@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useFonts, Poppins_800ExtraBold_Italic } from '@expo-google-fonts/poppins';
 import { PlayfairDisplay_400Regular_Italic } from '@expo-google-fonts/playfair-display';
 import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar, StyleSheet, View } from 'react-native';
+import { StatusBar, } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { DataProvider } from './src/Persistence/DataContext'; 
 import { AuthProvider } from './src/Persistence/AuthContext';

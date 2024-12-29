@@ -114,6 +114,11 @@ const styles = StyleSheet.create({
     textAlign:'center',
   },
 
+  lock: { 
+    marginRight: 15, 
+    marginTop: 50, 
+  },
+
 
 });
 

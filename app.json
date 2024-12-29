@@ -7,7 +7,7 @@
     "icon": "./assets/mcfnewlogo.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/iconMG.png",
+      "image": "./assets/iconmgg.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },

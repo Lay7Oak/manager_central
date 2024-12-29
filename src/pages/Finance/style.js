@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
   },
   dashboardItem: {
     fontSize: 21,
-    marginBottom: 5,
+    // marginBottom: 5,
     fontWeight:'bold',
     marginBottom: 13,
     

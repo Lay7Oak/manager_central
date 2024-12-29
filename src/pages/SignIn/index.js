@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert,  } from 'react-native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../../firebaseConfig';
 import * as Animatable from 'react-native-animatable';
@@ -95,7 +95,7 @@ const Login = () => {
               name={showSenha ? 'unlock' : 'lock'}
               size={20}
               color="#919191"
-              style={[{ marginRight: 15, marginTop: 50 }]}
+              style={styles.lock}
             />
           </TouchableOpacity>
         </View>

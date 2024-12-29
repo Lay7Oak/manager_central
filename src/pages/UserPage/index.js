@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, StyleSheet, Linking} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, Linking} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { DataContext } from '../../Persistence/DataContext'; 
 import Icon from 'react-native-vector-icons/FontAwesome'; 
