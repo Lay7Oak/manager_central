@@ -123,6 +123,7 @@ Este projeto foi criado por mim, **Laís Carvalho**, com a colaboração de **Fa
 - Modo Noturno.
 - Melhoria na segurança com senhas mais robustas para login.
 - Implementação de novas formas de login e autenticação (ex: autenticação via biometria, login social).
+- Melhoria na Fonte (tipografia) do app
 
 
 ---
