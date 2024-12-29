@@ -96,7 +96,7 @@ Esta é uma versão beta focada em testes, com o objetivo de coletar feedback do
 ---
 
 ## Sobre o Desenvolvimento
-Este projeto foi criado por mim, **Laís Carvalho**, com a colaboração de **Fabrício Vieira**, desenvolvedor backend e amigo que me ajudou com a implementação da lógica e de alguns serviços, além de contribuir na escolha dos serviços e funcionalidades que seriam disponibilizados nesta versão e das funcionalidades que serão implementadas futuramente. O projeto começou como um trabalho de extensão e se transformou em um objetivo pessoal para ambos.
+Este projeto foi criado por mim, **Laís Carvalho**, com a colaboração de **[Fabrício Vieira](https://github.com/vieira-fabricio)**, desenvolvedor backend e amigo que me ajudou com a implementação da lógica e de alguns serviços, além de contribuir na escolha dos serviços e funcionalidades que seriam disponibilizados nesta versão e das funcionalidades que serão implementadas futuramente. O projeto começou como um trabalho de extensão e se transformou em um objetivo pessoal para ambos.
 
 ---
 
