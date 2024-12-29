@@ -40,7 +40,7 @@
     "react-native-webview": "13.12.5"
   },
   "devDependencies": {
-    "@babel/core": "^7.25.20"
+    "@babel/core": "^7.25.2"
   },
   "expo": {
     "doctor": {
