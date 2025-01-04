@@ -40,7 +40,12 @@ export default function Servicos() {
       return;
     }
 
-    const precoFormatado = novoServico.preco.replace('.', '').replace(',', '.'); 
+    const precoFormatado = novoServico.preco.replace('.', '').replace(',', '.');
+    if (isNaN(precoFormatado) || precoFormatado <= 0) {
+      Alert.alert('Erro', 'Preço inválido.');
+      return;
+    }
+
     const servico = {
       ...novoServico,
       id: novoServico.id || Date.now().toString(),
@@ -66,30 +71,38 @@ export default function Servicos() {
     });
   };
 
-const alterarStatus = (id, novoStatus) => {
-  const dataAtual = new Date();
-  const servicosAtualizados = servicos.map(servico => {
-    if (servico.id === id) {
-    
-      if (novoStatus === 'Concluído' && servico.status !== 'Concluído') {
-        const novaReceita = {
-          tipo: 'receita',
-          valor: parseFloat(servico.preco),
-          descricao: `Serviço concluído: ${servico.descricao}`,
-          data: dataAtual,
-        };
-        const novasTransacoes = [...appData.transacoes, novaReceita];
-        setAppData(prev => ({ ...prev, transacoes: novasTransacoes }));
-      }
-
-      return { ...servico, status: novoStatus, statusData: dataAtual };
+  const alterarStatus = (id, novoStatus) => {
+    const dataAtual = new Date();
+  
+    if (!Array.isArray(servicos)) {
+      console.error('Erro: servicos não é um array válido.');
+      return;
     }
-    return servico;
-  });
-
-  setServicos(servicosAtualizados);
-  setAppData(prev => ({ ...prev, servicos: servicosAtualizados }));
-};
+  
+    const servicosAtualizados = servicos.map(servico => {
+      if (servico.id === id) {
+        if (novoStatus === 'Concluído' && servico.status !== 'Concluído') {
+          const novaReceita = {
+            tipo: 'receita',
+            valor: parseFloat(servico.preco),
+            descricao: `Serviço concluído: ${servico.descricao}`,
+            data: dataAtual,
+          };
+  
+          const novasTransacoes = appData.transacoes ? [...appData.transacoes, novaReceita] : [novaReceita];
+          
+          setAppData(prev => ({ ...prev, transacoes: novasTransacoes }));
+        }
+  
+        return { ...servico, status: novoStatus, statusData: dataAtual };
+      }
+      return servico;
+    });
+  
+    setServicos(servicosAtualizados);
+    setAppData(prev => ({ ...prev, servicos: servicosAtualizados }));
+  };
+  
 
 const editarServico = id => {
   const servico = servicos.find(s => s.id === id);

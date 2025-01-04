@@ -111,13 +111,14 @@ const adicionarPedido = () => {
   setAppData(prev => ({ ...prev, pedidos: pedidosAtualizados }));
 };
 
- const editarPedido = id => {
+const editarPedido = id => {
   const pedido = pedidos.find(p => p.id === id);
   if (pedido) {
-    if (pedido.status !== 'Pendente') {
+    if (pedido.status !== 'Aberto') {
       Alert.alert('Ação não permitida', 'Somente pedidos com status "Aberto" podem ser editados.');
       return; 
     }
+
     const data = new Date(pedido.data);
     setNovoPedido({
       ...pedido,
@@ -126,11 +127,78 @@ const adicionarPedido = () => {
   }
 };
 
+const salvarAlteracoes = () => {
+ 
+  const pedidoAlterado = novoPedido;
+
+  
+  const produtoAnterior = pedidos.find(p => p.id === pedidoAlterado.id);
+  if (produtoAnterior) {
+    const produtoSelecionado = produtosCadastrados.find(p => p.nomeProduto === pedidoAlterado.produto);
+    
+    const quantidadeAnterior = parseFloat(produtoAnterior.quantidade) || 0;
+    const quantidadeAlterada = parseFloat(pedidoAlterado.quantidade) || 0;
+
+    const quantidadeDisponivel = produtoSelecionado ? produtoSelecionado.quantidade : 0;
+
+    
+    const quantidadeMaximaPermitida = quantidadeAnterior + quantidadeDisponivel;
+
+    if (quantidadeAlterada > quantidadeMaximaPermitida) {
+      
+      Alert.alert(
+        'Erro',
+        `A quantidade disponível de ${produtoSelecionado.nomeProduto} é ${quantidadeDisponivel}. Você pode adicionar no máximo ${quantidadeMaximaPermitida} unidades no total.`
+      );
+
+      setNovoPedido(prev => ({
+        ...prev,
+        quantidade: quantidadeMaximaPermitida.toString(), 
+      }));
+
+      return;
+    }
+
+    const novaQuantidadeProduto = produtoSelecionado ? produtoSelecionado.quantidade - (quantidadeAlterada - quantidadeAnterior) : 0;
+    const statusProduto = novaQuantidadeProduto > 0 ? 'Disponível' : 'Indisponível';
+
+   
+    const updatedProdutos = produtosCadastrados.map(produto => {
+      if (produto.nomeProduto === pedidoAlterado.produto) {
+        return { ...produto, quantidade: novaQuantidadeProduto, status: statusProduto };
+      }
+      return produto;
+    });
+
+    setAppData(prev => ({ ...prev, produtos: updatedProdutos }));
+  }
+
+  const valorTotal = calcularTotal();
+
+
+  const novosPedidos = pedidos.map(p => p.id === pedidoAlterado.id ? { ...pedidoAlterado, valorTotal, statusData: new Date() } : p);
+  
+  
+  setPedidos(novosPedidos);
+  setAppData(prev => ({ ...prev, pedidos: novosPedidos }));
+
+  setNovoPedido({
+    id: '',
+    cliente: '',
+    produto: '',
+    data: new Date(),
+    quantidade: '',
+    valorUnitario: '',
+    formaPagamento: '',
+    status: 'Aberto',
+    descricao: '',
+  });
+};
+
 
 const cancelarPedido = (id) => {
   const pedido = pedidos.find(p => p.id === id);
   if (!pedido) return;
-
 
   const updatedProdutos = appData.produtos.map(produto => {
     if (produto.nomeProduto === pedido.produto) {
@@ -144,7 +212,6 @@ const cancelarPedido = (id) => {
     return produto;
   });
   setAppData(prev => ({ ...prev, produtos: updatedProdutos }));
-
 
   const novasTransacoes = (appData.transacoes || []).map(transacao => {
     if (
@@ -165,14 +232,12 @@ const cancelarPedido = (id) => {
 
   setAppData(prev => ({ ...prev, transacoes: novasTransacoes }));
 
-
   const pedidosAtualizados = pedidos.map(p =>
     p.id === id ? { ...p, status: 'Cancelado', statusData: new Date() } : p
   );
   setPedidos(pedidosAtualizados);
   setAppData(prev => ({ ...prev, pedidos: pedidosAtualizados }));
 };
-
 
   const pedidosFiltrados = pedidos.filter(pedido =>
     pedido.cliente.toLowerCase().includes(busca.toLowerCase()) ||
@@ -323,9 +388,14 @@ return (
           style={styles.input}
           value={novoPedido.descricao}
           onChangeText={text => setNovoPedido({ ...novoPedido, descricao: text })} />
-        <TouchableOpacity style={styles.button} onPress={adicionarPedido}>
-          <Text style={styles.buttonText}>Adicionar Pedido</Text>
-        </TouchableOpacity>
+       <TouchableOpacity
+            style={styles.button}
+            onPress={novoPedido.id ? salvarAlteracoes : adicionarPedido}>
+            <Text style={styles.buttonText}>
+              {novoPedido.id ? 'Salvar Alterações' : 'Adicionar Pedido'}
+            </Text>
+          </TouchableOpacity>
+
         <View style={styles.divider} />
         <Text style={styles.sectionTitle}>Lista de Pedidos</Text>
         <View style={styles.containerButtonSmall}>
@@ -349,12 +419,13 @@ return (
             <Text style={styles.pedidoText}>Quantidade: {pedido.quantidade}</Text>
             <Text style={styles.pedidoText}>Valor Total: R$ {pedido.valorTotal.toFixed(2)}</Text>
             <Text style={styles.pedidoText}>Forma de Pagamento: {pedido.formaPagamento}</Text>
+            <Text style={styles.pedidoText}>Descrição: {pedido.descricao}</Text>
             <Text style={styles.pedidoTextStatus}>Status: {pedido.status}</Text>
             <View style={styles.containerButtonSmall}>
 
-              <TouchableOpacity
+            <TouchableOpacity
                 style={[styles.buttonSmall, styles.editButton]}
-                onPress={() => editarPedido(pedido.id)}              >
+                onPress={() => editarPedido(pedido.id)}>
                 <Text style={styles.buttonText}>Editar</Text>
               </TouchableOpacity>
 
