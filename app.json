@@ -4,10 +4,10 @@
     "slug": "new_project",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/mcfnewlogo.png",
+    "icon": "./assets/icon588.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/iconmgg.png",
+      "image": "./assets/icon588.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -16,7 +16,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/icon588.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.lay_oak.new_project"
@@ -33,6 +33,11 @@
         "projectId": "2f598e24-61ef-4442-8499-53a897a4076b"
       }
     },
-    "newArchEnabled": true
+    "newArchEnabled": true,
+    "updates": {
+      "enabled": true,
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
+    }
   }
 }
