@@ -37,7 +37,8 @@
     "react-native-safe-area-context": "4.12.0",
     "react-native-screens": "~4.4.0",
     "react-native-vector-icons": "*",
-    "react-native-webview": "13.12.5"
+    "react-native-webview": "13.12.5",
+    "expo-updates": "~0.26.10"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2"
@@ -46,7 +47,10 @@
     "doctor": {
       "reactNativeDirectoryCheck": {
         "listUnknownPackages": false,
-        "exclude": ["react-native-check-box", "react-native-html-to-pdf"]
+        "exclude": [
+          "react-native-check-box",
+          "react-native-html-to-pdf"
+        ]
       }
     }
   },
