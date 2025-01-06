@@ -229,7 +229,7 @@ import styles from './style';
           <Text style={styles.cancelAccount}>Cancelar Conta</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => navigation.navigate('Welcome')}>
+        <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
           <Text style={styles.cancelAccount}>Sair</Text>
         </TouchableOpacity>
 
