@@ -48,6 +48,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 30,
     textAlign:'center',
+    justifyContent:'center',
+    alignItems:'center',
   },
 
   datePickerContainer: {
@@ -142,6 +144,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginVertical: 10,
+  },
+
+  textDate: {
+    color: 'gray', // Cor padrão do texto
+    fontSize: 14,
+  },
+  selectedTextDate: {
+    color: 'black', // Cor do texto quando a data for selecionada (exemplo: preto)
   },
   
 });

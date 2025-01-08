@@ -230,68 +230,69 @@ const editarServico = id => {
             onChangeText={text => setNovoServico({ ...novoServico, tipoServico: text })}
           />
 
-          <View style={styles.datePickerContainer}>
-            <TextInput
-              placeholder="Data Solicitação"
-              style={styles.inputWithIcon}
-              value={
-                novoServico.dataExecucao instanceof Date && !isNaN(novoServico.dataExecucao)
-                  ? novoServico.dataExecucao.toLocaleDateString()
-                  : ''
-              }
-              onFocus={() => setShowDatePickerExecucao(true)}
-              showSoftInputOnFocus={false}
-            />
-            <TouchableOpacity onPress={() => setShowDatePickerExecucao(true)} style={styles.iconButton}>
-              <Icon name="calendar" size={25} color="#E87071" />
-            </TouchableOpacity>
-          </View>
+                <View style={styles.datePickerContainer}>
+                  <TouchableOpacity
+                    onPress={() => setShowDatePickerExecucao(true)}
+                    style={styles.inputWithIcon}
+                  >
+                    <Text>
+                      {novoServico.dataExecucao instanceof Date && !isNaN(novoServico.dataExecucao)
+                        ? `Data da Solicitação: ${novoServico.dataExecucao.toLocaleDateString()}`
+                        : 'Data da Solicitação'}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => setShowDatePickerExecucao(true)} style={styles.iconButton}>
+                    <Icon name="calendar" size={25} color="#E87071" />
+                  </TouchableOpacity>
+                </View>
 
-          {showDatePickerExecucao && (
-            <DateTimePicker
-              value={novoServico.dataExecucao instanceof Date ? novoServico.dataExecucao : new Date()}
-              mode="date"
-              display="default"
-              onChange={(event, date) => {
-                setShowDatePickerExecucao(false);
-                if (date) {
-                  setNovoServico({ ...novoServico, dataExecucao: date });
-                }
-              }}
-            />
-          )}
+                {showDatePickerExecucao && (
+                  <DateTimePicker
+                    value={novoServico.dataExecucao instanceof Date ? novoServico.dataExecucao : new Date()}
+                    mode="date"
+                    display="default"
+                    onChange={(event, date) => {
+                      setShowDatePickerExecucao(false);
+                      if (date) {
+                        setNovoServico({ ...novoServico, dataExecucao: date });
+                      }
+                    }}
+                  />
+                )}
 
-          <View style={styles.datePickerContainer}>
-            <TextInput
-              placeholder="Data Agendada"
-              style={styles.inputWithIcon}
-              value={
-                novoServico.dataAgendada instanceof Date && !isNaN(novoServico.dataAgendada)
-                  ? novoServico.dataAgendada.toLocaleDateString()
-                  : ''
-              }
-              onFocus={() => setShowDatePickerAgendada(true)}
-              showSoftInputOnFocus={false}
-            />
-            <TouchableOpacity onPress={() => setShowDatePickerAgendada(true)} style={styles.iconButton}>
-              <Icon name="calendar" size={25} color="#E87071" />
-            </TouchableOpacity>
-          </View>
+                <View style={styles.datePickerContainer}>
+                
+                  <TouchableOpacity
+                    onPress={() => setShowDatePickerAgendada(true)}
+                    style={styles.inputWithIcon}
+                  >
+                    <Text>
+                      {novoServico.dataAgendada instanceof Date && !isNaN(novoServico.dataAgendada)
+                        ? `Data de Agendamento: ${novoServico.dataAgendada.toLocaleDateString()}`
+                        : 'Data de Agendamento'}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => setShowDatePickerAgendada(true)} style={styles.iconButton}>
+                    <Icon name="calendar" size={25} color="#E87071" />
+                  </TouchableOpacity>
+                </View>
 
-          {showDatePickerAgendada && (
-            <DateTimePicker
-              value={novoServico.dataAgendada instanceof Date ? novoServico.dataAgendada : new Date()}
-              mode="date"
-              display="default"
-              onChange={(event, date) => {
-                setShowDatePickerAgendada(false);
-                if (date) {
-                  setNovoServico({ ...novoServico, dataAgendada: date });
-                }
-              }}
-              minimumDate={new Date()} 
-            />
-          )}
+                {showDatePickerAgendada && (
+                  <DateTimePicker
+                    value={novoServico.dataAgendada instanceof Date ? novoServico.dataAgendada : new Date()}
+                    mode="date"
+                    display="default"
+                    minimumDate={new Date()}
+                    onChange={(event, date) => {
+                      setShowDatePickerAgendada(false);
+                      if (date) {
+                        setNovoServico({ ...novoServico, dataAgendada: date });
+                      }
+                    }}
+                  />
+                )}
+
+
 
           <TextInput
             placeholder="Descrição do Serviço"
@@ -344,7 +345,7 @@ const editarServico = id => {
               <Text style={styles.servicoText}>Cliente: {servico.cliente}</Text>
               <Text style={styles.servicoText}>Tipo de Serviço: {servico.tipoServico}</Text>
               <Text style={styles.servicoText}>Data da Solicitação: {new Date(servico.dataExecucao).toLocaleDateString()}</Text>
-              <Text style={styles.servicoText}>Data Agendada: {new Date(servico.dataAgendada).toLocaleDateString()}</Text>
+              <Text style={styles.servicoText}>Data de Agendamento: {new Date(servico.dataAgendada).toLocaleDateString()}</Text>
               <Text style={styles.servicoText}>Descrição: {servico.descricao}</Text>
               <Text style={styles.servicoText}>Preço: R$ {servico.preco.replace('.', ',')}</Text>
               <Text style={styles.servicoText}>Status Data: {servico.statusData ? new Date(servico.statusData).toLocaleDateString() : ''}</Text>

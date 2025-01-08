@@ -52,7 +52,7 @@ export default function Register() {
   };
 
   const validarSenha = (senha) => {
-    const senhaRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
+    const senhaRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[+@$!%*?&])[A-Za-z\d+@$!%*?&]+$/;
     return senhaRegex.test(senha);
   };
   

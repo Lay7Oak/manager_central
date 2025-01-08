@@ -12,6 +12,7 @@ import * as Sharing from 'expo-sharing';
   const [produtos, setProdutos] = useState(appData?.produtos || []); 
   const [nomeProduto, setNomeProduto] = useState('');
   const [precoUnitario, setPrecoUnitario] = useState('');
+  const [precoRevenda, setPrecoRevenda] = useState('');
   const [fornecedor, setFornecedor] = useState('');
   const [dataInsercao, setDataInsercao] = useState('');
   const [validade, setValidade] = useState('');
@@ -36,11 +37,12 @@ import * as Sharing from 'expo-sharing';
     return quantidade && preco ? quantidade * preco : 0;
   };
   const adicionarOuEditarProduto = () => {
-    if (nomeProduto && precoUnitario && fornecedor && quantidade && descricao) {
+    if (nomeProduto && precoUnitario && precoRevenda && fornecedor && quantidade && descricao) {
       const novoProduto = {
         id: editingIndex !== null ? produtos[editingIndex].id : Date.now(),
         nomeProduto,
         precoUnitario,
+        precoRevenda,
         fornecedor,
         dataInsercao,
         validade,
@@ -96,6 +98,7 @@ import * as Sharing from 'expo-sharing';
   const resetForm = () => {
     setNomeProduto("");
     setPrecoUnitario("");
+    setPrecoRevenda("");
     setFornecedor("");
     setDataInsercao("");
     setValidade("");
@@ -120,6 +123,7 @@ import * as Sharing from 'expo-sharing';
     const produto = produtos[index];
     setNomeProduto(produto.nomeProduto);
     setPrecoUnitario(produto.precoUnitario);
+    setPrecoRevenda(produto.precoRevenda);
     setFornecedor(produto.fornecedor);
     setDataInsercao(produto.dataInsercao);
     setValidade(produto.validade);
@@ -213,6 +217,7 @@ const generatePDF = async () => {
             <li> 
               <strong>Nome do Produto:</strong> ${produto.nomeProduto} <br />
               <strong>Preço Unitário:</strong> ${produto.precoUnitario.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} <br /> 
+              <strong>Preço Revenda:</strong> ${produto.precoRevenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} <br />
               <strong>Fornecedor:</strong> ${produto.fornecedor} <br />
               <strong>Data de Inserção:</strong> ${produto.dataInsercao} <br />
               <strong>Validade:</strong> ${produto.validade} <br />
@@ -272,6 +277,16 @@ return (
           style={styles.inputSmall}        />
       </View>
       <TextInput
+          placeholder="Preço de Venda"
+          keyboardType="numeric"
+          value={precoRevenda}
+          onChangeText={(value) => {
+            setPrecoRevenda(value);
+          }}
+          style={[styles.inputSmall, { marginBottom: 10 }]}
+        />
+
+      <TextInput
         placeholder="Fornecedor"
         value={fornecedor}
         onChangeText={setFornecedor}
@@ -321,6 +336,7 @@ return (
             <View key={item.id} style={styles.productItem}>
               <Text style={styles.productText}>Nome: {item.nomeProduto}</Text>
               <Text style={styles.productText}>Preço Unitário: R$ {item.precoUnitario}</Text>
+              <Text style={styles.productText}>Preço Revenda: R$ {item.precoRevenda}</Text>
               <Text style={styles.productText}>Fornecedor: {item.fornecedor}</Text>
               <Text style={styles.productText}>Data Inserção: {item.dataInsercao}</Text>
               <Text style={styles.productText}>Validade: {item.validade}</Text>

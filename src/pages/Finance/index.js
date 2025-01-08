@@ -250,7 +250,7 @@ export default function Finance() {
                 ordenarTransacoes();
               }}>
                 <Text style={styles.buttonText}>
-                  {ordenarPorMaisNovos ? 'Ordenar Antigo' : 'Ordenar Novo'}
+                  {ordenarPorMaisNovos ? 'Ordenar Novo' : 'Ordenar Antigo'}
                 </Text>
               </TouchableOpacity>
             </View>

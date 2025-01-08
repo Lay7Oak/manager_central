@@ -16,7 +16,7 @@ import * as Sharing from 'expo-sharing';
     produto: '',
     data: new Date(),
     quantidade: '',
-    valorUnitario: '',
+    valorRevenda: '',
     formaPagamento: '',
     status: 'Aberto',
     descricao: '',
@@ -39,8 +39,8 @@ import * as Sharing from 'expo-sharing';
   const produtosDisponiveis = produtosCadastrados.filter(produto => produto.quantidade > 0);
   const calcularTotal = () => {
   const quantidade = parseFloat(novoPedido.quantidade) || 0;
-  const valorUnitario = parseFloat(novoPedido.valorUnitario.replace(',', '.')) || 0;
-  return quantidade * valorUnitario;
+  const valorRevenda = parseFloat(novoPedido.valorRevenda.replace(',', '.')) || 0;
+  return quantidade * valorRevenda;
 };
 const adicionarPedido = () => {
   if (!novoPedido.cliente || !novoPedido.produto || !novoPedido.quantidade) {
@@ -83,7 +83,7 @@ const adicionarPedido = () => {
     produto: '',
     data: new Date(),
     quantidade: '',
-    valorUnitario: '',
+    valorRevenda: '',
     formaPagamento: '',
     status: 'Aberto',
     descricao: '',
@@ -188,7 +188,7 @@ const salvarAlteracoes = () => {
     produto: '',
     data: new Date(),
     quantidade: '',
-    valorUnitario: '',
+    valorRevenda: '',
     formaPagamento: '',
     status: 'Aberto',
     descricao: '',
@@ -294,7 +294,7 @@ const cancelarPedido = (id) => {
                           <strong>Cliente:</strong> ${pedido.cliente} <br />
                           <strong>Produto:</strong> ${pedido.produto} <br /> 
                           <strong>Quantidade:</strong> ${pedido.quantidade} <br />
-                          <strong>Valor Unitário:</strong> ${pedido.valorUnitario.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} <br />
+                          <strong>Valor Revenda:</strong> ${pedido.valorRevenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} <br />
                           <strong>Valor Total:</strong> ${pedido.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} <br />
                           <strong>Forma de Pagamento:</strong> ${pedido.formaPagamento} <br />
                           <strong>Status:</strong> ${pedido.status} <br />
@@ -360,12 +360,12 @@ return (
             setNovoPedido({
               ...novoPedido,
               produto: itemValue,
-              valorUnitario: produtoSelecionado ? produtoSelecionado.precoUnitario : '',     });    }}     >
+              valorRevenda: produtoSelecionado ? produtoSelecionado.precoRevenda : '',     });    }}     >
           <Picker.Item label="Selecione um produto" value="" />
           {produtosDisponiveis.map((produto) => (
             <Picker.Item
               key={produto.id}
-              label={`${produto.nomeProduto} (R$${produto.precoUnitario})`}    value={produto.nomeProduto}    />   ))}
+              label={`${produto.nomeProduto} (R$${produto.precoRevenda})`}    value={produto.nomeProduto}    />   ))}
         </Picker>
         <TextInput
           placeholder="Quantidade"
