@@ -11,6 +11,7 @@ Esta é uma versão beta focada em testes, com o objetivo de coletar feedback do
 - Cadastro de produtos com os seguintes campos:
   - Nome do produto
   - Preço unitário
+  - Preço revenda
   - Quantidade
   - Fornecedor
   - Data de inserção
