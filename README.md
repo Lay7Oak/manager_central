@@ -3,6 +3,7 @@
 Manager Central é um aplicativo desenvolvido para gerenciar pequenos negócios de forma simples e eficiente.  
 Esta é uma versão beta focada em testes, com o objetivo de coletar feedback dos usuários sobre a experiência, funcionalidades e usabilidade. O aplicativo foi projetado para atender diversos perfis, desde MEIs e estabelecimentos formais até revendedores e autônomos.
 
+👉 [Assista ao Short no YouTube](https://youtube.com/shorts/WzwUo-51hiw)
 ---
 
 ## Funcionalidades Principais
